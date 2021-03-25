@@ -72,7 +72,7 @@ def index():
 
             if current_user.get_id() is not None:
                 str_id = str(current_user.get_id())
-                usr_fp = os.path.join(str(user_data_path) + str_id, uploaded_file.filename)
+                usr_fp = os.path.join("/app/app/static/user_data/"+ str_id, uploaded_file.filename)
                 if uploaded_file.filename != "":
                     uploaded_file.save(usr_fp)
             else:
@@ -86,7 +86,7 @@ def index():
                         for row in csv_file:
                             data.append(row)
             else:
-                usr_fp = os.path.join(user_data_path + str_id, uploaded_file.filename)
+                usr_fp = os.path.join("/app/app/static/user_data/" + str_id, uploaded_file.filename)
                 if uploaded_file.filename != "":
                     with open(usr_fp) as file:
                         csv_file = csv.reader(file)
@@ -174,9 +174,9 @@ def login():
                 login_user(user, remember=form.remember.data)
                 str_id = str(current_user.get_id())
                 absolute_path = os.path.abspath(__file__)
-                if os.path.exists(os.path.join(os.path.dirname(absolute_path) + "/static/user_data", str_id)) == False:
-                    os.mkdir(os.path.join(os.path.dirname(absolute_path) + "/static/user_data", str_id), mode=0o777)
-                    os.chmod(os.path.join(os.path.dirname(absolute_path) + "/static/user_data", str_id), stat.S_IWRITE)
+                if os.path.exists(os.path.join("/app/app/static/user_data", str_id)) == False:
+                    os.mkdir(os.path.join("/app/app/static/user_data/", str_id), mode=0o777)
+                    os.chmod(os.path.join("/app/app/static/user_data/", str_id), stat.S_IWRITE)
                 return redirect('/')
 
         return '<h1>Invalid username or password</h1>'
@@ -213,13 +213,13 @@ def dashboard():
         user_id_list_dump = json.dumps(user_id_list)
         print(user_id_list_dump)
         str_id = str(current_user.get_id())
-        directory = os.path.join(user_data_path,str_id)
-        fix_directory = os.path.join(user_data_path,str_id + "/")
+        directory = os.path.join("/app/app/static/user_data/",str_id)
+        fix_directory = os.path.join("/app/app/static/user_data/",str_id + "/")
         print(os.path.abspath(os.getcwd()))
 
         absolute_path = os.path.abspath(__file__)
 
-        files_in_dir = next(os.walk(user_data_path+ str_id))[2]
+        files_in_dir = next(os.walk("/app/app/static/user_data/"+ str_id))[2]
         print(files_in_dir)
         print(user_data_path+ str_id)
         files_in_dir_dump = json.dumps(len(files_in_dir))
