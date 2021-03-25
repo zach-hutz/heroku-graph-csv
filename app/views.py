@@ -34,8 +34,10 @@ file_upload_path = file_upload_path + "static/file/uploads"
 file_path = pathlib.Path(__file__).parent.absolute()
 file_path = str(file_path) + "/database.db"
 
+db_path = "/app/database.db"
+
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.path.join('sqlite:///' + file_path)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.path.join('sqlite:///' + db_path)
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 login_manager = LoginManager()
