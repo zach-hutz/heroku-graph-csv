@@ -30,7 +30,7 @@ file_upload_path = pathlib.Path(__file__).parent.absolute()
 file_upload_path = str(file_upload_path) + "/"
 file_upload_path = file_upload_path + "static/file/uploads"
 
-file_path = os.path.abspath(os.getcwd())+"\database.db"
+file_path = os.path.abspath(os.getcwd())+"/database.db"
 
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.path.join('sqlite:///' + file_path)
@@ -177,9 +177,9 @@ def login():
                 login_user(user, remember=form.remember.data)
                 str_id = str(current_user.get_id())
                 absolute_path = os.path.abspath(__file__)
-                if os.path.exists(os.path.join(os.path.dirname(absolute_path) + "\\static\\user_data", str_id)) == False:
-                    os.mkdir(os.path.join(os.path.dirname(absolute_path) + "\\static\\user_data", str_id), mode=0o777)
-                    os.chmod(os.path.join(os.path.dirname(absolute_path) + "\\static\\user_data", str_id), stat.S_IWRITE)
+                if os.path.exists(os.path.join(os.path.dirname(absolute_path) + "/static/user_data", str_id)) == False:
+                    os.mkdir(os.path.join(os.path.dirname(absolute_path) + "/static/user_data", str_id), mode=0o777)
+                    os.chmod(os.path.join(os.path.dirname(absolute_path) + "/static/user_data", str_id), stat.S_IWRITE)
                 return redirect('/')
 
         return '<h1>Invalid username or password</h1>'
@@ -217,7 +217,7 @@ def dashboard():
         print(user_id_list_dump)
         str_id = str(current_user.get_id())
         directory = os.path.join(user_data_path,str_id)
-        fix_directory = os.path.join(user_data_path,str_id + "\\")
+        fix_directory = os.path.join(user_data_path,str_id + "/")
 
 
 
