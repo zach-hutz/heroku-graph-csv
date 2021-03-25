@@ -32,7 +32,7 @@ file_upload_path = str(file_upload_path) + "/"
 file_upload_path = file_upload_path + "static/file/uploads"
 
 file_path = pathlib.Path(__file__).parent.absolute()
-file_path = str(file_path) + "/app/database.db"
+file_path = str(file_path) + "/database.db"
 
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.path.join('sqlite:///' + file_path)
