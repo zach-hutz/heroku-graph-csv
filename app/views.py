@@ -22,7 +22,7 @@ import pathlib
 import re
 
 
-user_data_path = user_data_path + "/app/app/static/user_data/"
+user_data_path = "/app/app/static/user_data/"
 
 file_upload_path = "/app/app/static/file/uploads"
 
