@@ -7,7 +7,7 @@ from flask_sqlalchemy  import SQLAlchemy
 from wtforms.validators import InputRequired, Email, Length
 import email_validator
 from wtforms import StringField, PasswordField, BooleanField
-from flask_wtf import FlaskForm 
+from flask_wtf import FlaskForm
 from flask_bootstrap import Bootstrap
 
 from app import app
@@ -26,11 +26,13 @@ user_data_path = pathlib.Path(__file__).parent.absolute()
 user_data_path = str(user_data_path) + "/"
 user_data_path = user_data_path + "static/user_data/"
 
+
 file_upload_path = pathlib.Path(__file__).parent.absolute()
 file_upload_path = str(file_upload_path) + "/"
 file_upload_path = file_upload_path + "static/file/uploads"
 
-file_path = os.path.abspath(os.getcwd())+"/database.db"
+file_path = pathlib.Path(__file__).parent.absolute()
+file_path = str(file_path) + "/database.db"
 
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.path.join('sqlite:///' + file_path)
@@ -76,7 +78,7 @@ def index():
 
             if current_user.get_id() is not None:
                 str_id = str(current_user.get_id())
-                usr_fp = os.path.join(user_data_path + str_id, uploaded_file.filename)
+                usr_fp = os.path.join(str(user_data_path) + str_id, uploaded_file.filename)
                 if uploaded_file.filename != "":
                     uploaded_file.save(usr_fp)
             else:
@@ -96,7 +98,7 @@ def index():
                         csv_file = csv.reader(file)
                         for row in csv_file:
                             data.append(row)
-                            
+
             data = pd.DataFrame(data[1:], columns=data[0])
             d_list = list(data.columns.values)
 
@@ -130,6 +132,7 @@ def index():
 
         elif request.form['javascript_data'] != "":
             desired_file = request.form['javascript_data'].strip()
+            print(desired_file)
             with open(desired_file) as file:
                 csv_file = csv.reader(file)
                 for row in csv_file:
@@ -206,7 +209,7 @@ def dashboard():
     user_id_list = list(user_id)
     user_id_list_dump = json.dumps(user_id_list)
     fix_directory = ''
-    
+
     files_in_dir_dump = json.dumps(files_in_dir)
     file_names_in_dir_dump = json.dumps(files_in_dir)
 
@@ -218,17 +221,20 @@ def dashboard():
         str_id = str(current_user.get_id())
         directory = os.path.join(user_data_path,str_id)
         fix_directory = os.path.join(user_data_path,str_id + "/")
+        print(os.path.abspath(os.getcwd()))
 
+        absolute_path = os.path.abspath(__file__)
 
-
-        files_in_dir = next(os.walk(directory))[2]
+        files_in_dir = next(os.walk(user_data_path+ str_id))[2]
+        print(files_in_dir)
+        print(user_data_path+ str_id)
         files_in_dir_dump = json.dumps(len(files_in_dir))
         file_names_in_dir_dump = json.dumps(files_in_dir)
 
 
     files_in_dir_dump = json.dumps(len(files_in_dir))
     file_names_in_dir_dump = json.dumps(files_in_dir)
-    
+
     dir_dump = json.dumps(fix_directory)
 
     return render_template('dashboard.html', userpath=dir_dump, name=current_user.username, dir_names=file_names_in_dir_dump, dir_length=files_in_dir_dump)
