@@ -72,7 +72,8 @@ def index():
 
             if current_user.get_id() is not None:
                 str_id = str(current_user.get_id())
-                usr_fp = os.path.join("/app/app/static/user_data/"+ str_id, uploaded_file.filename)
+                usr_fp = os.path.join("/app/app/static/user_data/", str_id)
+                usr_fp = os.path.join(usr_fp, uploaded_file.filename)
                 if uploaded_file.filename != "":
                     uploaded_file.save(usr_fp)
             else:
@@ -86,7 +87,8 @@ def index():
                         for row in csv_file:
                             data.append(row)
             else:
-                usr_fp = os.path.join("/app/app/static/user_data/" + str_id, uploaded_file.filename)
+                usr_fp = os.path.join("/app/app/static/user_data/", str_id)
+                usr_fp = os.path.join(usr_fp, uploaded_file.filename)
                 if uploaded_file.filename != "":
                     with open(usr_fp) as file:
                         csv_file = csv.reader(file)
