@@ -216,7 +216,8 @@ def dashboard():
         print(user_id_list_dump)
         str_id = str(current_user.get_id())
         directory = os.path.join("/app/app/static/user_data/",str_id)
-        fix_directory = os.path.join("/app/app/static/user_data/",str_id + "/")
+        fix_directory = os.path.join("/app/app/static/user_data/",str_id)
+        fix_directory = os.path.join(fix_directory,"/")
         print(os.path.abspath(os.getcwd()))
 
         absolute_path = os.path.abspath(__file__)
