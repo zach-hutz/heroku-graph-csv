@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Logout{% endblock %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block body %}
+<script>
+  localStorage.setItem("dir_len", 0);
+  localStorage.setItem("dir_name", "");
+  localStorage.setItem("logged_in", 0);
+  window.location.href = "http://127.0.0.1:5000";
+  </script>
+<link rel="stylesheet" type="text/css" href="https://dl.dropbox.com/s/iyrrn20zt5za9ma/styles.css"/>
+
+    <div>
+    </div> <!-- /container -->
+    {% endblock %}

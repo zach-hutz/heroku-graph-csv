@@ -1,0 +1,530 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block body %}
+    <body onload="JavaScript:checkRefresh();" onunload="JavaScript:prepareForRefresh();">
+    <div class="background">
+        <h1 style='text-align: center'>Graph CSV's</h1>
+        <br>
+        <br>
+        <br>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css"></script>
+        <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://dl.dropbox.com/s/iyrrn20zt5za9ma/styles.css"/>
+        
+        <script>
+
+
+            function checkRefresh()
+    {
+        // Get the time now and convert to UTC seconds
+        var today = new Date();
+        var now = today.getUTCSeconds();
+
+        // Get the cookie
+        var cookie = document.cookie;
+        var cookieArray = cookie.split('; ');
+
+        // Parse the cookies: get the stored time
+        for(var loop=0; loop < cookieArray.length; loop++)
+        {
+            var nameValue = cookieArray[loop].split('=');
+            // Get the cookie time stamp
+            if( nameValue[0].toString() == 'SHTS' )
+            {
+                var cookieTime = parseInt( nameValue[1] );
+            }
+            // Get the cookie page
+            else if( nameValue[0].toString() == 'SHTSP' )
+            {
+                var cookieName = nameValue[1];
+            }
+        }
+
+        if( cookieName &&
+            cookieTime &&
+            cookieName == escape(location.href) &&
+            Math.abs(now - cookieTime) < 5 )
+        {
+            // Refresh detected
+
+            // Insert code here representing what to do on
+            // a refresh
+            
+            var datayarray = JSON.parse("{{ datayarray }}");
+
+            var dataxarray = JSON.stringify("{{ dataxarray }}");
+            var dataxarray = JSON.parse(dataxarray);
+            var dataxarray = dataxarray.replaceAll("&#34;", '');
+            var dataxarray = dataxarray.replaceAll("[", '');
+            var dataxarray = dataxarray.replaceAll("]", '');
+            var dataxarray = dataxarray.replaceAll(" ", '');
+            var dataxarray = dataxarray.split(",")
+
+            var ylabel = JSON.stringify("{{ y_label }}");
+            var ylabel = JSON.parse(ylabel);
+
+            var biglist = JSON.stringify("{{ json_data }}");
+            var biglist = biglist.replaceAll("&#34;", '');
+            var biglist = biglist.replaceAll('"', "");
+            var biglist = biglist.replaceAll('   ', " ");
+            var biglist = JSON.parse(biglist);
+
+            var colname = JSON.stringify('{{ columname }}');
+            var colname = JSON.parse(colname);
+            var colname = colname.replaceAll("[", "");
+            var colname = colname.replaceAll("]", "");
+            var colname = colname.replaceAll("&#34;", '');
+            var colname = colname.split(",");
+
+            var horizarray = JSON.stringify("{{ horiz_array }}");
+            var horizarray = horizarray.replaceAll("&#34;", '');
+            var horizarray = horizarray.replaceAll('"', "");
+            var horizarray = horizarray.replaceAll('   ', " ");
+            var horizarray = JSON.parse(horizarray);
+
+
+        
+            if (localStorage.getItem("ident") == 1){
+                if (colname.length <= 2) {
+                    line_graph();
+
+                }else{
+                    alert("Please select a CSV file with Two Columns!");
+                }
+            }
+
+            if (localStorage.getItem("ident") == 2){
+                if (colname.length >= 3) {
+                    multi_line_graph();
+                }else{
+                    alert("Please select a CSV file with Three or more Columns!");
+                }
+            }
+
+            if (localStorage.getItem("ident") == 3){
+                if (colname.length <= 2) {
+                    bar_graph();
+                }else{
+                    alert("Please select a CSV file with Two Columns!");
+                }
+            }
+            if (localStorage.getItem("ident") == 4){
+                if (colname.length >= 3){
+                    stacked_bar_graph();
+                }else{
+                    alert("Please select a CSV file with Three or more Columns!");
+                }
+            }
+
+            // If you would like to toggle so this refresh code
+            // is executed on every OTHER refresh, then 
+            // uncomment the following line
+            // refresh_prepare = 0; 
+        }	
+
+        // You may want to add code in an else here special 
+        // for fresh page loads
+
+
+    }
+
+    function prepareForRefresh()
+    {
+        if( refresh_prepare > 0 )
+        {
+            // Turn refresh detection on so that if this
+            // page gets quickly loaded, we know it's a refresh
+            var today = new Date();
+            var now = today.getUTCSeconds();
+            document.cookie = 'SHTS=' + now + ';';
+            document.cookie = 'SHTSP=' + escape(location.href) + ';';
+        }
+        else
+        {
+            // Refresh detection has been disabled
+            document.cookie = 'SHTS=;';
+            document.cookie = 'SHTSP=;';
+        }
+    }
+
+    function disableRefreshDetection()
+    {
+        // The next page will look like a refresh but it actually
+        // won't be, so turn refresh detection off.
+        refresh_prepare = 0;
+
+        // Also return true so this can be placed in onSubmits
+        // without fear of any problems.
+        return true;
+    } 
+
+    // By default, turn refresh detection on
+    var refresh_prepare = 1;
+        </script>
+
+        <script>
+            var dbfilepath;
+            var dbgraphtype;
+            $(document).ready(function(){
+                $('table').DataTable();
+
+                if (sessionStorage.getItem('choice') != null){
+                    var dbfilepath = sessionStorage.getItem('choice');
+
+
+                    document.getElementById('javascript_data').value = dbfilepath;
+                    document.getElementById('magic_hidden_form').submit();
+
+                    sessionStorage.removeItem("choice");
+
+                    if (sessionStorage.getItem('graphtype') == 1){
+                        console.log("option 1");
+                        localStorage.setItem("ident", 1);
+                    }
+
+                    if (sessionStorage.getItem('graphtype') == 2){
+                        localStorage.setItem("ident", 2);
+                    }
+
+                    if (sessionStorage.getItem('graphtype') == 3){
+                        localStorage.setItem("ident", 3);
+
+                        bar_graph();
+                    }
+
+                    if (sessionStorage.getItem('graphtype') == 4){
+                        localStorage.setItem("ident", 4);
+
+                        stacked_bar_graph();
+                    }
+
+                    sessionStorage.removeItem("graphtype");
+
+                }
+
+                $("#form_button").on('click', function(e) {
+                        e.preventDefault();
+                        validateDropDown();
+                    });
+
+            function validateDropDown() {
+                    var ddl = document.getElementById('ddl');
+                    console.log(ddl);
+                    if(ddl.selectedIndex == 0 || ddl.options[ddl.selectedIndex].value == -1) {
+                        alert('Please select a valid option!');
+                        return false;
+                    }
+                    if(ddl.selectedIndex == 1){
+                        $('#hidden_data').removeClass('hidden');
+                        localStorage.setItem("ident", 1);
+                    }
+                    if(ddl.selectedIndex == 2){
+                        $('#hidden_data').removeClass('hidden');
+                        localStorage.setItem("ident", 2);
+                    }
+                    if(ddl.selectedIndex == 3){
+                        $('#hidden_data').removeClass('hidden');
+                        localStorage.setItem("ident", 3);
+                    }
+                    if(ddl.selectedIndex == 4){
+                        $('#hidden_data').removeClass('hidden');
+                        localStorage.setItem("ident", 4);
+
+                    }
+                    return true;
+                }
+
+            });
+
+          function bar_graph() {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var datayarray = JSON.parse("{{ datayarray }}");
+            var datayarray = JSON.parse("{{ datayarray }}");
+            var dataxarray = JSON.stringify("{{ dataxarray }}");
+            var dataxarray = JSON.parse(dataxarray);
+            var dataxarray = dataxarray.replaceAll("&#34;", '');
+            var dataxarray = dataxarray.replaceAll("[", '');
+            var dataxarray = dataxarray.replaceAll("]", '');
+            var dataxarray = dataxarray.replaceAll(" ", '');
+            var ylabel = JSON.stringify("{{ y_label }}");
+            var ylabel = JSON.parse(ylabel);
+            var ylabel = ylabel.replaceAll("&#34;", '"');
+            var dataxarray = dataxarray.split(",")
+            var biglist = JSON.stringify("{{ json_data }}");
+            var biglist = biglist.replaceAll("&#34;", '');
+            var biglist = biglist.replaceAll('"', "");
+            var biglist = biglist.replaceAll('   ', " ");
+            var biglist = JSON.parse(biglist);
+
+            var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dataxarray,
+                datasets: [{
+                    label: ylabel,
+                    data: datayarray,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+            });
+        }
+
+        function stacked_bar_graph() {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var datayarray = JSON.parse("{{ datayarray }}");
+            var datayarray = JSON.parse("{{ datayarray }}");
+            var dataxarray = JSON.stringify("{{ dataxarray }}");
+            var dataxarray = JSON.parse(dataxarray);
+            var dataxarray = dataxarray.replaceAll("&#34;", '');
+            var dataxarray = dataxarray.replaceAll("[", '');
+            var dataxarray = dataxarray.replaceAll("]", '');
+            var dataxarray = dataxarray.replaceAll(" ", '');
+            var ylabel = JSON.stringify("{{ y_label }}");
+            var ylabel = JSON.parse(ylabel);
+            var ylabel = ylabel.replaceAll("&#34;", '"');
+            var dataxarray = dataxarray.split(",")          
+            var biglist = JSON.stringify("{{ json_data }}");
+            var biglist = biglist.replaceAll("&#34;", '');
+            var biglist = biglist.replaceAll('"', "");
+            var biglist = biglist.replaceAll('   ', " ");
+            var biglist = JSON.parse(biglist);
+            var colname = JSON.stringify('{{ columname }}');
+            var colname = JSON.parse(colname);
+            var colname = colname.replaceAll("[", "");
+            var colname = colname.replaceAll("]", "");
+            var colname = colname.replaceAll("&#34;", '');
+            var colname = colname.split(",");
+            var horizarray = JSON.stringify("{{ horiz_array }}");
+            var horizarray = horizarray.replaceAll("&#34;", '');
+            var horizarray = horizarray.replaceAll('"', "");
+            var horizarray = horizarray.replaceAll('   ', " ");
+            var horizarray = JSON.parse(horizarray);
+
+            var bar_graph_data = 
+            {
+                label: colname,
+                data: biglist,
+                borderWidth: 1,
+                backgroundColor: '#EBCCD1'
+            }
+            var bcolor = ["#D6E9C6", "#FAEBCC", "#EBCCD1","#6A0888","#0000FF","#00FFFF"];
+            
+            var ary = [];
+            var i;
+            for (i = 0; i < biglist.length; i++) {
+                ary.push({
+                    label: colname[i+1],
+                    data: biglist[i],
+                    borderWidth: 1,
+                    backgroundColor: bcolor[i]
+                })
+            }
+
+            var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                    labels: dataxarray,
+                    datasets: ary,                 
+            },
+            options: {
+                scales: {
+                    xAxes: [{ stacked: true }],
+                    yAxes: [{ stacked: true }]
+                }
+            }
+            });
+        }
+
+        function line_graph() {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var datayarray = JSON.parse("{{ datayarray }}");
+            var datayarray = JSON.parse("{{ datayarray }}");
+            var dataxarray = JSON.stringify("{{ dataxarray }}");
+            var dataxarray = JSON.parse(dataxarray);
+            var dataxarray = dataxarray.replaceAll("&#34;", '');
+            var dataxarray = dataxarray.replaceAll("[", '');
+            var dataxarray = dataxarray.replaceAll("]", '');
+            var dataxarray = dataxarray.replaceAll(" ", '');
+            var ylabel = JSON.stringify("{{ y_label }}");
+            var ylabel = JSON.parse(ylabel);
+            var ylabel = ylabel.replaceAll("&#34;", '"');
+            var dataxarray = dataxarray.split(",")
+
+            var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dataxarray,
+                datasets: [{
+                    label: ylabel,
+                    data: datayarray,
+                    backgroundColor: [
+                    'rgba(255, 76, 0, 0.25)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 28, 20, 1)',
+                    ],
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+            });
+        }
+
+        function multi_line_graph() {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var datayarray = JSON.parse("{{ datayarray }}");
+            var datayarray = JSON.parse("{{ datayarray }}");
+            var dataxarray = JSON.stringify("{{ dataxarray }}");
+            var dataxarray = JSON.parse(dataxarray);
+            var dataxarray = dataxarray.replaceAll("&#34;", '');
+            var dataxarray = dataxarray.replaceAll("[", '');
+            var dataxarray = dataxarray.replaceAll("]", '');
+            var dataxarray = dataxarray.replaceAll(" ", '');
+            var ylabel = JSON.stringify("{{ y_label }}");
+            var ylabel = JSON.parse(ylabel);
+            var ylabel = ylabel.replaceAll("&#34;", '"');
+            var dataxarray = dataxarray.split(",")
+            var biglist = JSON.stringify("{{ json_data }}");
+            var biglist = biglist.replaceAll("&#34;", '');
+            var biglist = biglist.replaceAll('"', "");
+            var biglist = biglist.replaceAll('   ', " ");
+            var biglist = JSON.parse(biglist);
+            var colname = JSON.stringify('{{ columname }}');
+            var colname = JSON.parse(colname);
+            var colname = colname.replaceAll("[", "");
+            var colname = colname.replaceAll("]", "");
+            var colname = colname.replaceAll("&#34;", '');
+            var colname = colname.split(",");
+
+            var line_graph_data = 
+            {
+                label: colname,
+                data: biglist,
+                borderWidth: 1,
+                fill: false,
+                borderColor: 'red'
+            }
+            var bcolor = ["red", "blue", "green","orange","yellow","purple"];
+            
+            var ary = [];
+            var i;
+            for (i = 0; i < biglist.length; i++) {
+                ary.push({
+                    label: colname[i+1],
+                    data: biglist[i],
+                    borderWidth: 1,
+                    fill: false,
+                    borderColor: bcolor[i]
+                })
+            }
+
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dataxarray,
+                    datasets: ary,
+                },
+                options: {
+                    scales: {
+                    yAxes: [{
+                        ticks: {
+                        beginAtZero: true
+                        }
+                    }]
+                    },
+                }
+                
+                });
+            }
+    
+        </script>
+    </div>
+    <div>
+        <p class="lead">Select Option from dropdown window</p>
+    </div>
+    <div>
+        <form id='form_id' onsubmit="return validateDropDown('ddl');">
+            <select id="ddl">
+                <option value="-1">----- Please Select -----</option>
+                <option value="1">Single Line Graph</option>
+                <option value="2">Multiple Line Graph</option>
+                <option>Single Bar Graph</option>
+                <option>Stacked Bar Graph</option>
+            </select>
+            <br>
+            <input id='form_button' type="submit" />
+        </form>
+    </div>
+    <br>
+    <div>
+        <form id='hidden_data' class='hidden' method="POST" enctype="multipart/form-data">
+            <input class='background' type="file" id="myFile" name="filename" accept=".csv">
+            <input id='hiddenButton' class='button_form' type="submit">
+        </form>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div id="div_table">
+        {% for table in tables %}
+                {{ table|safe }}
+        {% endfor %}
+        {{ error_msg }}
+    </div>
+    <div>
+        <canvas id="myChart" width="100" height="100"></canvas>
+    </div>
+    <div>
+        <form id='magic_hidden_form' style="display: none;" method="POST" enctype="multipart/form-data">
+            <input type="text" id='javascript_data' name='javascript_data'>
+            <input id='javascript_data_submit' type='submit'>
+        </form>
+    </div>
+</body>
+
+{% endblock %}
