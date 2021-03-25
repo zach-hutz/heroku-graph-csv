@@ -23,12 +23,12 @@ import re
 
 
 user_data_path = pathlib.Path(__file__).parent.absolute()
-user_data_path = str(user_data_path) + "\\"
-user_data_path = user_data_path + "static\\user_data\\"
+user_data_path = str(user_data_path) + "/"
+user_data_path = user_data_path + "static/user_data/"
 
 file_upload_path = pathlib.Path(__file__).parent.absolute()
-file_upload_path = str(file_upload_path) + "\\"
-file_upload_path = file_upload_path + "static\\file\\uploads"
+file_upload_path = str(file_upload_path) + "/"
+file_upload_path = file_upload_path + "static/file/uploads"
 
 file_path = os.path.abspath(os.getcwd())+"\database.db"
 
