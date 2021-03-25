@@ -16,6 +16,9 @@
   var name_in_dir = name_in_dir.replaceAll("[", "");
   var name_in_dir = name_in_dir.replaceAll("]", "");
   var name_in_dir = name_in_dir.replaceAll("&#34;", '"');
+  var name_in_dir = name_in_dir.replaceAll("&#39;", '');
+  var name_in_dir = name_in_dir.replaceAll("(", '');
+  var name_in_dir = name_in_dir.replaceAll(")", '');
   var name_in_dir = name_in_dir.replaceAll('"', '');
 
   var name_in_dir = name_in_dir.split(",");
