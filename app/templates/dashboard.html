@@ -27,6 +27,9 @@
 
   var userpath = "{{ userpath }}";
   var userpath = userpath.replaceAll("&#34;", '');
+  var userpath = userpath.replaceAll("&#39;", '');
+  var userpath = userpath.replaceAll("(", '');
+  var userpath = userpath.replaceAll(")", '');
 
   var option;
   var pickedfile;
