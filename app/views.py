@@ -224,7 +224,7 @@ def dashboard():
 
         absolute_path = os.path.abspath(__file__)
 
-        files_in_dir = next(os.walk("/app/app/static/user_data/"+ str_id))[2]
+        files_in_dir = next(os.walk(directory))[2]
         print(files_in_dir)
         print(user_data_path+ str_id)
         files_in_dir_dump = json.dumps(len(files_in_dir))
