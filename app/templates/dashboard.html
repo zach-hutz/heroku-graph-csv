@@ -64,6 +64,7 @@
       var graphtype = $(this).attr('value');
       var filepath = userpath+filename;
       var filepath = filepath.replaceAll("\\ ", "\\");
+      var filepath = filepath.replaceAll("/ ", "/");
       console.log(filepath);
       sessionStorage.setItem("choice", filepath);
       sessionStorage.setItem("graphtype", graphtype);
