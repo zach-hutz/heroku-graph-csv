@@ -216,8 +216,8 @@ def dashboard():
         print(user_id_list_dump)
         str_id = str(current_user.get_id())
         directory = os.path.join("/app/app/static/user_data/",str_id)
-        fix_directory = os.path.join("/app/app/static/user_data/",str_id)
-        fix_directory = os.path.join(str(fix_directory),"/")
+        id_slash = str_id+"/"
+        fix_directory = os.path.join("/app/app/static/user_data/",id_slash)
         fix_directory = fix_directory.replace(" ", "")
         print(fix_directory)
         print(os.path.abspath(os.getcwd()))
