@@ -221,10 +221,12 @@ def dashboard():
         fix_directory = fix_directory.replace(" ", "")
         print(fix_directory)
         print(os.path.abspath(os.getcwd()))
+        
+        dir2 = "/app/app/static/user_data/"+str_id
 
         absolute_path = os.path.abspath(__file__)
 
-        files_in_dir = next(os.walk(directory))[2]
+        files_in_dir = next(os.walk(dir2))[2]
         print(files_in_dir)
         print(user_data_path+ str_id)
         files_in_dir_dump = json.dumps(len(files_in_dir))
