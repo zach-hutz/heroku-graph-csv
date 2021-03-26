@@ -223,6 +223,7 @@ def dashboard():
         print(os.path.abspath(os.getcwd()))
         
         dir2 = "/app/app/static/user_data/"+str_id
+        print(dir2)
 
         absolute_path = os.path.abspath(__file__)
 
